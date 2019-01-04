@@ -50,7 +50,8 @@ var chooseID = function() {
             chooseQuantity();
                 
         }else{
-            console.log("Sorry wrong item ID entered!");
+            console.log("Sorry wrong item ID entered, please instert the right ID number and check again");
+            connection.end();
         }
 
     })
@@ -63,11 +64,17 @@ var chooseQuantity = function() {
         type:"input"
 
     }).then(answer => {
-        if ("") {
-            console.log("");
-        }else {
-            console.log("");
+        connection.query("SELECT * FROM products WHERE stock_quantity", function (err, results) {
+            if (err) throw err;
+            for(let i = 0; i < results.length; i++) {
+            if (answer.quantity > results[i].stock_quantity) {
+                console.log("Unfortunately we couldn't fulfill your order at this item, please try to lower your quantity!");
+            }
+            else {
+                console.log("Thank you for your purchase, your order was received!");
+            }
         }
+        });
     })
 }
 
