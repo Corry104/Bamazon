@@ -1,7 +1,7 @@
 
 var inquirer = require("inquirer");
 var mysql = require("mysql");
-var id = "";
+
 
 
 // create the connection information for the sql database
@@ -38,16 +38,15 @@ function product() {
     });
 }
 
-
-
 var chooseID = function() {
     inquirer.prompt({
         name: "orderID",
         message: "Please select the item you want to purchase by its ID:\n",
-        type: "input"
+        type: "input",
+
 
     }).then(answer => {
-        if (answer.orderID === false) {
+        if (answer.orderID <= 10) {
             chooseQuantity();
                 
         }else{
@@ -55,8 +54,21 @@ var chooseID = function() {
         }
 
     })
-    
+}
 
+var chooseQuantity = function() {
+    inquirer.prompt({
+        name:"quantity",
+        message:"Please select the amount you would like to order:\n",
+        type:"input"
+
+    }).then(answer => {
+        if ("") {
+            console.log("");
+        }else {
+            console.log("");
+        }
+    })
 }
 
 
