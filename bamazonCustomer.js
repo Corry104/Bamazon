@@ -1,6 +1,7 @@
 
 var inquirer = require("inquirer");
 var mysql = require("mysql");
+var chalk = require("chalk");
 
 
 
@@ -32,7 +33,7 @@ function product() {
         if (err) throw err;
         for(let i = 0; i < results.length; i++) {
             console.log("~~~~~~~~~~~~");
-            console.log("ID: " + results[i].id + " Product: " + results[i].product_name + " " + "$"+results[i].price);
+            console.log(chalk.green("ID: ") + results[i].id + chalk.blue(" Product: ") + results[i].product_name + chalk.magenta(" Available Stock: ") + results[i].stock_quantity + " " + chalk.yellow("$")+results[i].price);
         }
         chooseID();
     });
@@ -50,8 +51,8 @@ var chooseID = function() {
             chooseQuantity();
                 
         }else{
-            console.log("Sorry wrong item ID entered, please instert the right ID number and check again");
-            connection.end();
+            console.log(chalk.red("Sorry wrong item ID entered, please instert the right ID number and check again"));
+            chooseID();
         }
 
     })
@@ -64,16 +65,16 @@ var chooseQuantity = function() {
         type:"input"
 
     }).then(answer => {
-        connection.query("SELECT * FROM products WHERE stock_quantity", function (err, results) {
+        connection.query("SELECT * FROM products", chooseQuantity.quantity, function (err, results) {
             if (err) throw err;
-            for(let i = 0; i < results.length; i++) {
-            if (answer.quantity > results[i].stock_quantity) {
-                console.log("Unfortunately we couldn't fulfill your order at this item, please try to lower your quantity!");
+            if (answer.quantity > results[0].stock_quantity) {
+                console.log(chalk.red("Unfortunately we couldn't fulfill your order at this item, please try to lower your quantity!"));
+                chooseQuantity();
             }
             else {
-                console.log("Thank you for your purchase, your order was received!");
+                console.log(chalk.green("Thank you for your purchase, your order was received!"));
+
             }
-        }
         });
     })
 }
