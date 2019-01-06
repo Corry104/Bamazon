@@ -31,9 +31,10 @@ function showProducts() {
     console.log("\nWelcome to bamazon! Selecting all products for you: \n");
     connection.query("SELECT * FROM products ORDER BY product_name", function (err, results) {
         if (err) throw err;
+        console.log("~~~~~~~~~~~~showProducts~~~~~~~~~~~~~~~~");
         for(var i = 0; i < results.length; i++) {
-            console.log("~~~~~~~~~~~~showProducts~~~~~~~~~~~~~~~~");
-            console.log(chalk.blue("Product: " + results[i].product_name)  + " " + chalk.yellow("\n$" + results[i].price) + chalk.magenta("\nAvailable in Stock: " + results[i].stock_quantity) + chalk.green("\nID: " + results[i].id));
+            
+            console.log(chalk.green("ID: " + results[i].id) + chalk.blue(" - Product: " + results[i].product_name)  + " " + chalk.yellow(" - $" + results[i].price) + chalk.magenta(" - Available in Stock: " + results[i].stock_quantity));
         
         }
         console.log("~~~~~~~~~~~~~~end showProducts~~~~~~~~~~~~~~");
@@ -52,7 +53,6 @@ function chooseID(results) {
        
 
     }).then(answer => {
-        console.log("prova = "+results);
          compareId(answer.orderID, results);
 
     })
@@ -60,11 +60,9 @@ function chooseID(results) {
 
 //checks if the inserted id exists
 function compareId(insertedId, results) {
-    console.log("answer : "+insertedId);
     var exists = false;
     for(var c = 0; c < results.length; c++) {
         if(insertedId == results[c].id){
-            console.log("si e uguale")
             exists = true;
             var quantityOfProduct = results[c].stock_quantity;
 			var price = results[c].price;
@@ -104,11 +102,11 @@ function chooseQuantity(quantityOfProduct, insertedId, price) {
 
 //updates the quantity of the product
 function updateDB(insertedId, quantityPurchased){
-    console.log(insertedId+" - "+quantityPurchased);
-    var sql = "UPDATE products SET quantity = '"+quantityPurchased+"' WHERE id = '"+insertedId+"'";
-    console.log("1");
+    var sql = "UPDATE products SET stock_quantity = '"+quantityPurchased+"' WHERE id = '"+insertedId+"'";
 	connection.query(sql, function (err, results) {
-		if (err) throw err;
+		if (err){
+            throw err;
+        } 
 		console.log(results.affectedRows + " record(s) updated");
 	});
 	//showProducts();
