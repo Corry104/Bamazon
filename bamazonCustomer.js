@@ -26,17 +26,19 @@ connection.connect(function (err) {
     showProducts();    
 });
 
-//shows the product list
+//show all products available
 function showProducts() {
     console.log("\nWelcome to bamazon! Selecting all products for you: \n");
+    //creating the connection to the database
     connection.query("SELECT * FROM products ORDER BY product_name", function (err, results) {
         if (err) throw err;
+        console.log("~~~~~~~~~~~~Below is our product list~~~~~~~~~~~~~~~~");
         for(var i = 0; i < results.length; i++) {
-            console.log("~~~~~~~~~~~~showProducts~~~~~~~~~~~~~~~~");
-            console.log(chalk.blue("Product: " + results[i].product_name)  + " " + chalk.yellow("\n$" + results[i].price) + chalk.magenta("\nAvailable in Stock: " + results[i].stock_quantity) + chalk.green("\nID: " + results[i].id));
-        
+            console.log(chalk.green("ID: " + results[i].id) + chalk.blue(" - Product: " + results[i].product_name)  + " " + chalk.yellow(" - $" + results[i].price) + chalk.magenta(" - Available in Stock: " + results[i].stock_quantity));
         }
-        console.log("~~~~~~~~~~~~~~end showProducts~~~~~~~~~~~~~~");
+        console.log("~~~~~~~~~~~~~~end of our product list~~~~~~~~~~~~~~");
+        //call the function to ask the user for the product ID and brings the results
+        //to avoid multiple connections
         chooseID(results);
     });
     
@@ -49,34 +51,33 @@ function chooseID(results) {
         name: "orderID",
         message: "Please select the item you want to purchase by its ID:\n",
         type: "input",
-       
 
     }).then(answer => {
-        console.log("prova = "+results);
-         compareId(answer.orderID, results);
+        //call the function to check the user's answer with the table's id
+        compareId(answer.orderID, results);
 
     })
 }
 
 //checks if the inserted id exists
 function compareId(insertedId, results) {
-    console.log("answer : "+insertedId);
-    var exists = false;
+    //set the variable to false
+    var exist = false;
+    //loop through the results
     for(var c = 0; c < results.length; c++) {
+        //matching the id with the database's table and break once it does
         if(insertedId == results[c].id){
-            console.log("si e uguale")
-            exists = true;
+            exist = true;
             var quantityOfProduct = results[c].stock_quantity;
 			var price = results[c].price;
             break;
         }
     }
-    if(exists){
+    if(exist){
         chooseQuantity(quantityOfProduct, insertedId, price);
         
     }else{
-        //qui inserire il messaggio che dice: prodotto inesistente, inserire un altro id
-        console.log("This product does not exist, please choose another one.");
+        console.log(chalk.red("This product does not exist, please choose another one."));
 		chooseID(results);
     }
 }
@@ -90,12 +91,13 @@ function chooseQuantity(quantityOfProduct, insertedId, price) {
         type:"input"
 
     }).then(answer2 => {
-		
+		//if the quantity request is available run this function and call the update function
 		if(answer2.quantity <= quantityOfProduct){
-			var tot = answer2.quantity*price;
-            console.log(chalk.green("Thank you for your purchase, your order was received and the total amount is "+tot));
+			var tot = answer2.quantity * price;
+            console.log(chalk.green("Thank you for your purchase, your order was received and the total amount is $ " + tot));
             updateDB(insertedId, answer2.quantity);
-        }else{
+        }
+        else{
             console.log(chalk.red("Unfortunately we don't have enough items available to fulfill your order, please try to lower your quantity!"));
 			chooseQuantity(quantityOfProduct, insertedId, price);
         }
@@ -104,23 +106,10 @@ function chooseQuantity(quantityOfProduct, insertedId, price) {
 
 //updates the quantity of the product
 function updateDB(insertedId, quantityPurchased){
-    console.log(insertedId+" - "+quantityPurchased);
-    var sql = "UPDATE products SET quantity = '"+quantityPurchased+"' WHERE id = '"+insertedId+"'";
-    console.log("1");
+    var sql = "UPDATE products SET stock_quantity = " + quantityPurchased + " WHERE id = " + insertedId + "";
 	connection.query(sql, function (err, results) {
 		if (err) throw err;
-		console.log(results.affectedRows + " record(s) updated");
+		console.log(chalk.magenta(results.affectedRows + " record has been updated! Thank you!"));
 	});
-	//showProducts();
 	connection.end();
 }
-
-// //closes connection
-// function closeConnection(){
-// 	connection.end(function(err) {
-// 	  if (err) {
-// 		return console.log('error:' + err.message);
-// 	  }
-// 	  console.log('Close the database connection.');
-// 	});	
-// }

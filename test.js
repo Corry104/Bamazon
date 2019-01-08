@@ -90,7 +90,7 @@ function chooseQuantity(quantityOfProduct, insertedId, price) {
     }).then(answer2 => {
 		
 		if(answer2.quantity <= quantityOfProduct){
-			var tot = answer2.quantity*price;
+            var tot = answer2.quantity*price;
             console.log(chalk.green("Thank you for your purchase, your order was received and the total amount is "+tot));
             updateDB(insertedId, answer2.quantity);
         }else{
